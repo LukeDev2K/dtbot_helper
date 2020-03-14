@@ -1,12 +1,11 @@
 const request = require('request');
-var qs = require('querystring');
-// var host = 'http://192.168.246.1:8000';
-var host = 'https://qr.gzmitech.com';
+const qs = require('querystring');
+const config = require('../config');
 
 function get(path, data, callback) {
     var content = qs.stringify(data);
-    console.log("content: " + content);
-    var url = host + path;
+    console.log("start http get: " + content);
+    var url = config.basic.HOST + path;
     if(content != null && content != ""){
         url += "?" + content;
     }

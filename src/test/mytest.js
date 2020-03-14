@@ -1,6 +1,7 @@
 const checker = require('../utils/checker');
 const comutil = require('../utils/comutil');
 const networkutil = require('../utils/networkutil');
+const config = require('../config');
 
 // const targetRooms = checker.config['TARGET_YANGMAO_ROOMS']
 // for (i = 0; i < targetRooms.length; i++) {
@@ -20,45 +21,20 @@ const networkutil = require('../utils/networkutil');
 // console.log('https://u.jd.com/jawKeJ'.indexOf('jd.com') != -1)
 
 
-// const checkRooms = checker.config['LEAVE_JOIN_ROOMS'];
-// for (i = 0; i < checkRooms.length; i++) {
-//     console.log(checkRooms[i])
-// }
+// networkutil.getFullMask(async (ret, msg, data) => {
+//     if (ret == 0) {
+//         console.log("\n\n----------------------" + data.title)
+//     }
+// })
 
-
-
-var shortUrlInfo = []; //保存链接，避免重复
-var showFull = true;
-//定时
-setInterval(() => {
-    showFull = !showFull;
-    if (showFull) {
-        networkutil.getFullMask(async (ret, msg, data) => {
-            dealRet(ret, msg, data)
-        })
-    } else {
-        networkutil.getSmzdmMask(async (ret, msg, data) => {
-            dealRet(ret, msg, data)
-        })
+var lastTime = new Date().getTime();
+var random = comutil.random(config.intervals.GET_FULL_MASK[0], config.intervals.GET_FULL_MASK[1]);
+setInterval(function () {
+    var currentTime = new Date().getTime();
+    var offset = currentTime - lastTime;
+    if (offset > random) {
+        lastTime = currentTime;
+        console.log("offset: " + offset + "  lastTime: " + lastTime + "  random: " + random);
+        random = comutil.random(1000, 10000);
     }
-
-    function dealRet(ret, msg, data) {
-        if (ret == 0) {
-            for (i = 0; i < shortUrlInfo.length; i++) {
-                if (data.shorturl == shortUrlInfo[i]) {
-                    console.log("已经更新过： " + data.shorturl);
-                    // return;
-                }
-            }
-            if (shortUrlInfo.length >= 2) {
-                console.log('超过了最大数: ' + shortUrlInfo.length);
-                shortUrlInfo.length = 0
-            }
-            shortUrlInfo.push(data.shorturl);
-            const checkRooms = checker.config['TARGET_MASK_ROOMS'];
-            for (i = 0; i < checkRooms.length; i++) {
-                // console.log('msg: ' + msg + " shorturl: " + data.shorturl);
-            }
-        }
-    }
-}, 15000)
+}, 1000);
